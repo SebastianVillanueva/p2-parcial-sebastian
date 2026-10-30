@@ -1,0 +1,274 @@
+\documentclass[10pt]{article}
+% ---------------------------------------------------------------------------
+% Formato NeurIPS. Si neurips_2024.sty está disponible (p. ej. plantilla oficial en Overleaf),
+% se usa; si no, se replica su geometría (5.5 x 9 in, Times 10 pt, título entre reglas).
+% ---------------------------------------------------------------------------
+\IfFileExists{neurips_2024.sty}{%
+  \usepackage[final]{neurips_2024}\newcommand{\neuripsoficial}{}%
+}{%
+  \usepackage[letterpaper,textwidth=5.5in,textheight=9in,top=1in,headheight=12pt,headsep=25pt,footskip=30pt]{geometry}%
+  \usepackage{mathptmx}%
+  \usepackage[scaled=.92]{helvet}%
+}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\captionsetup{font=small,labelfont=bf}
+\setlist{nosep,leftmargin=1.4em}
+
+% Español sin babel-spanish
+\renewcommand{\abstractname}{Resumen}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\refname}{Referencias}
+\renewcommand{\contentsname}{Contenido}
+\providecommand{\keywords}[1]{\par\smallskip\noindent\textbf{Palabras clave:} #1}
+
+\IfFileExists{generado/numeros.tex}{\input{generado/numeros.tex}}{}
+\IfFileExists{generado/texto.tex}{\input{generado/texto.tex}}{}
+\providecommand{\PENDIENTEb}{\textcolor{red}{[pendiente: b]}}
+\providecommand{\PENDIENTEc}{\textcolor{red}{[pendiente: c]}}
+\providecommand{\PENDIENTEeval}{\textcolor{red}{[pendiente: eval]}}
+\providecommand{\PENDIENTElima}{\textcolor{red}{[pendiente: lima]}}
+\providecommand{\PENDIENTEerr}{\textcolor{red}{[pendiente: err]}}
+\providecommand{\PENDIENTEconc}{\textcolor{red}{[pendiente: conc]}}
+\providecommand{\BestRun}{\textcolor{red}{??}}
+\providecommand{\BestLoss}{\textcolor{red}{??}}
+\providecommand{\BestData}{\textcolor{red}{??}}
+\providecommand{\Steps}{\textcolor{red}{??}}
+\providecommand{\IoUvalEone}{\textcolor{red}{??}}
+\providecommand{\IoUvalEtwo}{\textcolor{red}{??}}
+\providecommand{\IoUtestBest}{\textcolor{red}{??}}
+\providecommand{\IoUotsuTest}{\textcolor{red}{??}}
+\providecommand{\IoUvalNoSkip}{\textcolor{red}{??}}
+\providecommand{\IoUvalDepthThree}{\textcolor{red}{??}}
+\providecommand{\MinutesTotal}{\textcolor{red}{??}}
+\providecommand{\FonetestBest}{\textcolor{red}{??}}
+\providecommand{\PrectestBest}{\textcolor{red}{??}}
+\providecommand{\RectestBest}{\textcolor{red}{??}}
+
+\newcommand{\fig}[2]{\IfFileExists{figuras/#1}{\includegraphics[#2]{figuras/#1}}{\fbox{\parbox{0.9\linewidth}{\centering\small Figura pendiente: \texttt{\detokenize{#1}}}}}}
+
+\ifdefined\neuripsoficial\else
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{center}
+  \rule{\linewidth}{4pt}\par\vspace{0.25in}
+  {\LARGE\bfseries \@title\par}\vspace{0.2in}
+  \rule{\linewidth}{1pt}\par\vspace{0.25in}
+  {\normalsize \@author\par}\vspace{0.3in}
+  \end{center}}
+\renewenvironment{abstract}{\begin{center}\large\bfseries\abstractname\end{center}\vspace{-0.5em}\begin{quote}\small}{\end{quote}}
+\makeatother
+\fi
+
+\title{Mapeo de inundaciones con radar Sentinel-1 y U-Net:\\ ablación de supervisión ruidosa y generalización a Lima (marzo de 2017)}
+\author{%
+  Elias Sebastian Villanueva Pinto\\
+  Maestría en Inteligencia Artificial, FIIS -- Universidad Nacional de Ingeniería\\
+  Redes Neuronales y Aprendizaje Profundo, 2026-II -- Examen parcial, Pregunta 2
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Durante una inundación, las nubes inutilizan a los satélites ópticos justo cuando más se los necesita; el radar de apertura sintética (SAR) de Sentinel-1 las atraviesa y adquiere de día y de noche. Implementamos desde cero una U-Net para segmentar el agua píxel a píxel a partir de las bandas VV y VH, y la entrenamos con Sen1Floods11, que combina 446 chips etiquetados a mano por expertos con miles de chips etiquetados automáticamente por umbralización. Un estudio de ablación con presupuesto de cómputo fijo compara (a) entrenar solo con etiquetas doradas frente a añadir etiquetas débiles, (b) cuatro funciones de pérdida y (c) dos variantes arquitectónicas. El mejor modelo (\BestRun{}: etiquetas doradas, pérdida Dice y profundidad 3) alcanza un IoU de agua de \IoUtestBest{} en la prueba en distribución, frente a \IoUotsuTest{} del umbral de Otsu. Las etiquetas débiles no mejoran el rendimiento en distribución, pero en Bolivia, un evento no visto, elevan el IoU de 0.41 a 0.72. Para medir la generalización a una región nunca vista construimos una región de prueba propia para el Perú: la escena Sentinel-1 del 17 de marzo de 2017 sobre Lima ---el mismo día de los desbordes del río Rímac en Huachipa y Carapongo--- contrastada con la delineación de la activación EMSN038 de Copernicus EMS. Allí el IoU cae a 0.001 en las siete variantes. Un diagnóstico físico muestra que la retrodispersión dentro de los polígonos de EMSN038 ($-18.9$\,dB) está lejos de la del agua abierta ($-25.4$\,dB) y no aumenta al retirarse la inundación: la brecha refleja sobre todo el desajuste de la referencia óptica, que cartografía huellas de lodo días después, más que un fallo del modelo. Cerramos con un análisis cualitativo de los errores característicos del SAR: suelo húmedo, vegetación inundada, doble rebote y sombra de radar.
+\keywords{segmentación semántica, U-Net, SAR, Sentinel-1, inundaciones, supervisión débil, generalización geográfica, El Niño costero.}
+\end{abstract}
+
+% ===========================================================================
+\section{Introducción y motivación}
+\label{sec:intro}
+Entre enero y marzo de 2017, el \emph{Niño costero} provocó lluvias extraordinarias en la costa peruana. En Lima ---una ciudad desértica donde casi nunca llueve--- los ríos Rímac, Chillón y Huaycoloro se desbordaron y los huaicos afectaron Carapongo, Santa María de Huachipa, Cajamarquilla, Comas, Carabayllo y Puente Piedra. El Servicio de Gestión de Emergencias de Copernicus (EMS) respondió con la activación EMSN038, que delimitó en polígonos las zonas inundadas a partir de imágenes ópticas WorldView-2 del 18 y 21 de marzo \citep{emsn038}.
+
+Ese tipo de cartografía es crítica en las horas siguientes al desastre, pero depende de imágenes ópticas que las nubes de tormenta suelen bloquear. El radar de apertura sintética (SAR) de la misión Sentinel-1 \citep{torres2012} emite su propia señal de microondas: atraviesa las nubes y adquiere de noche. Físicamente, el agua tranquila se comporta como un espejo que refleja la señal lejos del satélite (retrodispersión baja, píxeles oscuros), mientras que el suelo rugoso, la vegetación y las construcciones devuelven más energía. Por eso el SAR es la herramienta \emph{de facto} para el mapeo rápido de inundaciones.
+
+Este trabajo implementa una U-Net \citep{ronneberger2015} para segmentar la extensión del agua a partir de Sentinel-1 y aborda tres preguntas:
+\begin{enumerate}
+\item \textbf{Supervisión.} ¿Conviene entrenar solo con pocas etiquetas expertas, o añadir muchas etiquetas automáticas ruidosas?
+\item \textbf{Diseño.} ¿Qué función de pérdida y qué decisiones arquitectónicas funcionan mejor para un problema con fuerte desbalance de clases?
+\item \textbf{Generalización.} ¿Qué tan bien transfiere un modelo entrenado en llanuras aluviales de otros continentes a la inundación urbana y por huaicos de Lima?
+\end{enumerate}
+
+\textbf{Contribuciones.} (i) Una U-Net propia en PyTorch, configurable en profundidad, conexiones de salto y \emph{upsampling}; (ii) un estudio de ablación con presupuesto de cómputo fijo; (iii) una región de prueba peruana construida a partir de dos fuentes independientes (Sentinel-1 y EMSN038), procesada al mismo formato que el dataset; y (iv) un análisis de la brecha de generalización y de los errores típicos del SAR. Todo el código es reproducible con un único comando.
+
+% ===========================================================================
+\section{Trabajos relacionados}
+\label{sec:rel}
+\textbf{Segmentación semántica con redes totalmente convolucionales.} \citet{long2015} mostraron que una red de clasificación puede convertirse en un predictor denso reemplazando sus capas totalmente conectadas por convoluciones. La U-Net \citep{ronneberger2015} añadió un camino de expansión simétrico y \emph{conexiones de salto por concatenación}, que reinyectan en el decodificador la información espacial fina que el codificador pierde al reducir resolución. Además, propuso entrenar con muy pocas imágenes gracias a un aumento de datos agresivo (deformaciones elásticas) y a una pérdida ponderada por un mapa de pesos que enfatiza los bordes. Sus variantes posteriores incluyen V-Net \citep{milletari2016}, que introdujo la pérdida Dice para lidiar con el desbalance de clases; U-Net++ \citep{zhou2018}, con saltos anidados; Attention U-Net \citep{oktay2018}, con compuertas de atención en los saltos; y nnU-Net \citep{isensee2021}, que autoconfigura la arquitectura para cada dataset.
+
+\textbf{Mapeo de inundaciones con SAR.} El enfoque clásico umbraliza la retrodispersión, típicamente con el método de Otsu \citep{otsu1979} sobre histogramas bimodales, y lo refina con información auxiliar en cadenas automáticas como la de \citet{twele2016}. Estos métodos son rápidos y no requieren entrenamiento, pero confunden el agua con otras superficies oscuras (sombra de radar, pistas, arena seca) y fallan donde el agua no es especularmente lisa. \citet{bonafilia2020} publicaron Sen1Floods11, el primer dataset global georreferenciado para entrenar redes en este problema, e informaron que redes totalmente convolucionales entrenadas con abundantes etiquetas automáticas podían superar a las entrenadas solo con las escasas etiquetas manuales. Para la referencia de agua permanente usamos el mapa global de \citet{pekel2016}, y para obtener las escenas, Google Earth Engine \citep{gorelick2017}.
+
+% ===========================================================================
+\section{Datos}
+\label{sec:datos}
+\textbf{Sen1Floods11.} Contiene 11 eventos de inundación en seis continentes, en chips de $512\times512$ píxeles a 10\,m (EPSG:4326) con las bandas VV y VH en dB \citep{bonafilia2020}. Usamos 446 chips con etiqueta \emph{dorada} (agua / no agua / sin datos, anotada por expertos) y la partición oficial: 252 de entrenamiento, 89 de validación y 90 de prueba (eventos vistos), más 15 de Bolivia (evento reservado). Como fuente \emph{débil} tomamos una muestra aleatoria reproducible de 1\,500 de los 4\,160 chips etiquetados automáticamente por umbral de Otsu sobre VH, excluyendo Bolivia. El agua representa el 9.5\,\% de los píxeles válidos del entrenamiento dorado, pero el 17.8\,\% en las etiquetas débiles: un primer indicio de que el umbral sobreestima el agua.
+
+\textbf{Preprocesamiento.} Igual que los autores del dataset, recortamos los dB a $[-50,1]$ y los escalamos a $[0,1]$; luego estandarizamos cada banda con media y desviación calculadas \emph{solo} sobre el entrenamiento dorado, para evitar fuga de información. Los píxeles sin datos (etiqueta $-1$ o SAR no válido) se excluyen de la pérdida y de las métricas.
+
+\textbf{Región de prueba propia: Lima, 17 de marzo de 2017.} Sen1Floods11 no incluye eventos peruanos. Buscamos en ASF Vertex todas las escenas Sentinel-1 GRD IW de doble polarización (VV+VH) sobre Lima entre el 10 y el 31 de marzo de 2017 y encontramos tres: 10-mar (otra pasada, antes del evento), \textbf{17-mar 10:38 UTC} (Sentinel-1B, órbita relativa 171, descendente) y 29-mar (misma órbita, 12 días después). La del 17 de marzo coincide con el día de los desbordes en Huachipa y Carapongo y precede en un día a la imagen WorldView-2 usada por EMSN038, así que la elegimos como escena de prueba. La obtuvimos de Earth Engine (\texttt{COPERNICUS/S1\_GRD}), con la calibración, corrección de terreno y conversión a dB con que se construyó Sen1Floods11, y la remuestreamos a su misma grilla (EPSG:4326, $8.98\times10^{-5}$\,°). Como etiqueta usamos la capa de extensión de inundación de EMSN038 (\texttt{DamAssess\_A}, derivada por análisis de objetos sobre la imagen óptica) restringida a la inundación \emph{observada} a lo largo de los ríos (\texttt{source = river}, 660 polígonos, 6.34\,km²); se excluye la extensión extrapolada hasta la cota máxima del agua. Los polígonos se rasterizaron sobre esa grilla y la escena se recortó en chips de $512\times512$. Solo se evalúan los píxeles que cumplen tres condiciones: (i) están dentro del área de interés de EMSN038, (ii) están en tierra firme y (iii) no son agua permanente según JRC \citep{pekel2016} (ocurrencia $\geq50\,\%$). Así se excluyen el mar y los cauces permanentes, que EMSN038 no delimita.
+
+\textbf{Advertencia metodológica.} Las etiquetas de EMSN038 no se generaron con el mismo criterio que las doradas: provienen de imágenes ópticas de mucho mayor resolución, de fechas posteriores a la escena SAR y de un proceso orientado a evaluar daños. Las tratamos, por tanto, como \emph{supervisión débil propia} y no como verdad de terreno perfecta; parte de la brecha medida en la Sec.~\ref{sec:lima} se explica por la propia referencia.
+
+% ===========================================================================
+\section{Metodología}
+\label{sec:metodo}
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,
+  blk/.style={draw,rounded corners=1pt,minimum width=1.25cm,minimum height=0.55cm,font=\scriptsize,align=center,fill=#1},
+  blk/.default=white, >={Stealth[length=4pt]}]
+\node[blk=gray!10] (in) at (0,0) {Entrada\\2$\times$256$^2$};
+\node[blk=blue!8] (e0) at (1.6,0) {32};
+\node[blk=blue!8] (e1) at (2.6,-0.9) {64};
+\node[blk=blue!8] (e2) at (3.6,-1.8) {128};
+\node[blk=blue!8] (e3) at (4.6,-2.7) {256};
+\node[blk=blue!18] (b) at (6.0,-3.4) {512\\cuello};
+\node[blk=green!10] (d3) at (7.4,-2.7) {256};
+\node[blk=green!10] (d2) at (8.4,-1.8) {128};
+\node[blk=green!10] (d1) at (9.4,-0.9) {64};
+\node[blk=green!10] (d0) at (10.4,0) {32};
+\node[blk=orange!15] (out) at (12.0,0) {Conv 1$\times$1\\$\sigma$ $\to$ agua};
+\draw[->] (in)--(e0); \draw[->] (d0)--(out);
+\foreach \a/\c in {e0/e1,e1/e2,e2/e3,e3/b} \draw[->,red!60!black] (\a)--(\c) node[midway,left,font=\tiny]{pool};
+\foreach \a/\c in {b/d3,d3/d2,d2/d1,d1/d0} \draw[->,green!40!black] (\a)--(\c) node[midway,right,font=\tiny]{up};
+\foreach \a/\c in {e0/d0,e1/d1,e2/d2,e3/d3} \draw[->,dashed,gray] (\a)--(\c);
+\node[font=\tiny,gray] at (6.0,0.25) {conexiones de salto (concatenación)};
+\end{tikzpicture}
+\caption{U-Net implementada (\texttt{base}=32, profundidad 4; 7.76\,M parámetros). Cada bloque: dos convoluciones $3\times3$ con \emph{padding}, BatchNorm y ReLU. Bajada: \emph{max-pooling} $2\times2$; subida: convolución transpuesta $2\times2$; salida: un logit por píxel.}
+\label{fig:arq}
+\end{figure}
+
+\textbf{Arquitectura (Fig.~\ref{fig:arq}).} Implementamos la U-Net desde cero, sin bibliotecas de segmentación, siguiendo la Fig.~1 de \citet{ronneberger2015} con tres cambios hoy estándar: \emph{padding}~=~1 (salida del mismo tamaño que la entrada, sin recortes), BatchNorm \citep{ioffe2015} e inicialización de He \citep{he2015}. La entrada tiene dos canales (VV, VH) y la salida, un único logit de agua; para dos clases, \emph{sigmoide} con entropía cruzada binaria es equivalente a \emph{softmax} con dos logits. La implementación permite variar la profundidad, eliminar las conexiones de salto y cambiar el \emph{upsampling} (convolución transpuesta o bilineal).
+
+\textbf{Funciones de pérdida.} Con $p$ la probabilidad predicha, $y$ la etiqueta y $v$ el conjunto de píxeles válidos, comparamos:
+(i) \emph{BCE}: $\mathcal{L}_{BCE}=-\tfrac{1}{|v|}\sum_{x\in v}[y\log p+(1-y)\log(1-p)]$;
+(ii) \emph{Dice} suave \citep{milletari2016}: $\mathcal{L}_{D}=1-\tfrac{2\sum p\,y+1}{\sum p+\sum y+1}$, robusta al desbalance;
+(iii) su suma, \emph{BCE + Dice}; y
+(iv) \emph{BCE con peso en bordes}, una adaptación del mapa de pesos de U-Net (Ec.~2 de \citep{ronneberger2015}): $w(x)=1+w_0\,(G_\sigma * B)(x)$, donde $B$ marca el borde agua/no-agua, $G_\sigma$ es un suavizado gaussiano ($\sigma=3$\,px) y $w_0=5$. La motivación es que en Lima la inundación ocupa franjas angostas junto a los cauces, donde casi todo es borde.
+
+\textbf{Aumento de datos.} Usamos recortes aleatorios de $256\times256$ dentro de cada chip, rotaciones de 90° y volteos. También aplicamos deformaciones elásticas como en \citet{ronneberger2015}: desplazamientos gaussianos ($\sigma=10$\,px) en una grilla $3\times3$, interpolados de forma bicúbica y aplicados por igual a imagen y máscara. No usamos ajustes de brillo ni contraste, porque en SAR la intensidad es la señal física.
+
+\textbf{Entrenamiento y selección.} AdamW \citep{loshchilov2019} con política \emph{OneCycle} \citep{smith2019} (tasa máxima $2\times10^{-3}$), lote de 16, precisión mixta y \Steps{} pasos por corrida. El \emph{presupuesto fijo} es deliberado: así, añadir etiquetas débiles no gana solo por entrenar más tiempo. Al mezclar datos, se muestrea con probabilidad 0.5 desde los chips dorados y 0.5 desde los débiles, para que las 1\,500 etiquetas ruidosas no ``ahoguen'' a las 252 expertas. Se evalúa en validación cada 250 pasos y se conserva el mejor punto según el IoU de agua; ninguna decisión se toma con la partición de prueba.
+
+\textbf{Métricas.} Para la clase agua reportamos IoU $=\tfrac{TP}{TP+FP+FN}$, F1, precisión, recall, omisión $\tfrac{FN}{TP+FN}$ y comisión $\tfrac{FP}{TP+FP}$, las dos últimas siguiendo a \citet{bonafilia2020}. El IoU se da de dos formas: agregado sobre todos los píxeles y promedio por chip, que es la métrica de referencia de los autores del dataset.
+
+\textbf{Inferencia sobre escenas completas.} La escena de Lima ($\sim$5\,500$\times$4\,000\,px) se predice con la estrategia \emph{overlap-tile} de \citet{ronneberger2015}: mosaicos de 512\,px con 64\,px de margen, de los que solo se conserva el centro, y relleno por reflexión especular en los bordes de la escena.
+
+% ===========================================================================
+\section{Experimentos y resultados}
+\label{sec:res}
+\subsection{Estudio de ablación}
+\input{generado/tab_ablacion.tex}
+La Tabla~\ref{tab:ablacion} resume las siete corridas, que tomaron en total unos \MinutesTotal{} minutos en una GPU T4. Las curvas de aprendizaje están en la Fig.~\ref{fig:curvas}.
+
+\textbf{(a) Etiquetas doradas frente a doradas + débiles.} En validación, entrenar solo con los 252 chips dorados y deformación elástica (E1, IoU \IoUvalEone{}) supera ligeramente a añadir las etiquetas débiles (E2, \IoUvalEtwo{}); en prueba, ambas quedan empatadas (0.640 frente a 0.641). La diferencia aparece \emph{fuera de distribución}: en Bolivia, E2 alcanza un IoU de 0.716, frente a 0.408 de E1. El cambio se explica casi por completo por el recall (0.788 frente a 0.430), porque la precisión es la misma ($\approx$0.89). El modelo entrenado solo con etiquetas expertas aprende un criterio de ``agua'' conservador, ajustado a los 10 eventos vistos, y en una región nueva deja de detectar gran parte del agua. Las etiquetas de Otsu, más abundantes, más diversas y sesgadas hacia marcar más agua (17.8\,\% frente a 9.5\,\% de los píxeles), corrigen ese sesgo. Los resultados conectan así las dos tesis. En distribución se cumple la de U-Net \citep{ronneberger2015}: pocas etiquetas buenas con aumento agresivo bastan. Para generalizar, en cambio, la cantidad y diversidad de la supervisión débil importa, como observaron \citet{bonafilia2020}. Seleccionar el modelo con la validación en distribución descarta precisamente la opción que mejor generaliza (Sec.~\ref{sec:lim}).
+
+\textbf{(b) Función de pérdida.} \PENDIENTEb
+
+\textbf{(c) Arquitectura.} Sin conexiones de salto (E5a), el IoU de validación fue de \IoUvalNoSkip{}; con profundidad 3 (E5b), de \IoUvalDepthThree{}. \PENDIENTEc
+
+\begin{figure}[t]
+\centering\fig{fig_curvas.png}{width=\linewidth}
+\caption{Pérdida de entrenamiento (izq.) e IoU de agua en validación (der.) de las siete corridas. La oscilación a mitad del entrenamiento coincide con el máximo de la tasa de aprendizaje de la política OneCycle.}
+\label{fig:curvas}
+\end{figure}
+
+\subsection{Evaluación en distribución}
+\input{generado/tab_eval.tex}
+\begin{figure}[t]
+\centering\fig{fig_matriz_confusion.png}{width=0.85\linewidth}
+\caption{Matriz de confusión del modelo final en la prueba en distribución (90 chips dorados). Izquierda: conteos en millones de píxeles; derecha: normalizada por fila (recall por clase).}
+\label{fig:cm}
+\end{figure}
+El modelo final (\BestRun{}) obtiene en la prueba en distribución un IoU de \IoUtestBest{}, F1 de \FonetestBest{}, precisión de \PrectestBest{} y recall de \RectestBest{} (Tabla~\ref{tab:eval}, Fig.~\ref{fig:cm}). \PENDIENTEeval
+
+\subsection{Generalización geográfica al Perú}
+\label{sec:lima}
+\input{generado/tab_lima.tex}
+\PENDIENTElima
+
+\begin{figure}[t]
+\centering
+\fig{fig_lima_huachipa.png}{width=\linewidth}\\[2pt]
+\fig{fig_lima_comas.png}{width=\linewidth}
+\caption{Lima, 17 y 29 de marzo de 2017. Arriba: Huachipa--Carapongo (ríos Rímac y Huaycoloro); abajo: Comas--Carabayllo (río Chillón). De izquierda a derecha: VH (dB), predicción del 17-mar, mapa de error frente a EMSN038 (oscuro = acierto, rojo = falso positivo, azul = falso negativo) y predicción del 29-mar. En amarillo, el contorno de los polígonos EMSN038.}
+\label{fig:lima}
+\end{figure}
+
+\begin{figure}[t]
+\centering\fig{fig_lima_histogramas.png}{width=\linewidth}
+\caption{Diagnóstico físico de la región de Lima. Izquierda: distribución de VH dentro de los polígonos EMSN038 (rojo), en el resto del área evaluable (negro) y en el agua y no-agua de Sen1Floods11 (azul y gris); la línea discontinua es el umbral de Otsu de la escena ($-17.2$\,dB). Derecha: cambio de VH entre el 17 y el 29 de marzo (misma órbita).}
+\label{fig:hist}
+\end{figure}
+
+\textbf{Hipótesis sobre la brecha, contrastadas con la evidencia.}
+\begin{enumerate}
+\item \textbf{Desajuste temporal y de sensor de la referencia (respaldada).} EMSN038 delinea por análisis de objetos (OBIA) sobre WorldView-2 (óptico, submétrico) del 18 y 21 de marzo, mientras que el SAR es del 17 de marzo a las 05:38 hora local. Los huaicos y desbordes duran horas, y lo que la imagen óptica registra días después son \emph{huellas} de la inundación. La ausencia de un aumento de retrodispersión entre el 17 y el 29 de marzo dentro de los polígonos ($-0.41$\,dB) indica que el 17 tampoco había una lámina de agua que luego se retirara.
+\item \textbf{Lodo frente a agua abierta (respaldada).} Dentro de los polígonos, el VH tiene una distribución estrecha centrada en $-18.9$\,dB, típica de superficies algo más lisas que la ciudad (cauces de grava, barro y depósitos de huaico), y no los $-25$\,dB del agua abierta. Los huaicos son flujos de lodo de superficie rugosa, muy distintos de las llanuras aluviales de Sen1Floods11.
+\item \textbf{Geometría del radar (respaldada).} La mayoría de los falsos positivos se concentran en manchas sobre las laderas de los cerros de Huachipa, Cajamarquilla y Carabayllo (Fig.~\ref{fig:lima}): son \emph{sombras de radar} en las pendientes opuestas al sensor, en órbita descendente. Ningún evento de entrenamiento está en un relieve tan abrupto.
+\item \textbf{Escala y desbalance extremo (respaldada).} La inundación delineada son franjas de 100--200\,m a lo largo de los cauces, que ocupan el 0.35\,\% del área evaluable (frente al 9.5\,\% en Sen1Floods11). Con 285 píxeles secos por cada inundado, una tasa de falsos positivos de apenas 1.65\,\% basta para que estos superen en número a los aciertos, aunque el modelo acierte el 98\,\% del área seca.
+\item \textbf{Cobertura urbana y doble rebote (no verificable).} Las zonas afectadas incluyen áreas urbanas donde el agua entre edificaciones devolvería una señal brillante. Con la referencia disponible no es posible aislar este efecto de los anteriores.
+\end{enumerate}
+En conjunto, la brecha de Lima mide sobre todo el desacuerdo entre dos definiciones de inundación: la del modelo y de Sen1Floods11 (agua abierta visible para el radar en el instante de adquisición) y la de EMSN038 (área afectada, cartografiada en imágenes ópticas días después). No es posible atribuirla solo a una falla del modelo: un método sin entrenamiento también fracasa y la propia señal no contiene agua donde la referencia la marca.
+
+\subsection{Análisis cualitativo de errores característicos del SAR}
+\label{sec:errores}
+\begin{figure}[t]
+\centering
+\fig{fig_errores_FP.png}{width=0.49\linewidth}\hfill
+\fig{fig_errores_FN.png}{width=0.49\linewidth}
+\caption{Chips de prueba con más falsos positivos (izq.) y más falsos negativos (der.). Columnas: VV, VH, etiqueta dorada y mapa de error (gris oscuro = acierto agua, rojo = FP, azul = FN).}
+\label{fig:errores}
+\end{figure}
+\PENDIENTEerr
+
+% ===========================================================================
+\section{Discusión crítica y limitaciones}
+\label{sec:lim}
+\begin{itemize}
+\item \textbf{Una sola semilla.} Por restricciones de cómputo, cada configuración se entrenó una vez. Diferencias de uno o dos centésimos de IoU entre corridas están dentro de la variabilidad esperable entre semillas y no deben leerse como concluyentes. Lo correcto sería repetir cada corrida con 3--5 semillas y reportar media y desviación.
+\item \textbf{Presupuesto fijo y subconjunto débil.} Usamos 1\,500 de los 4\,160 chips débiles disponibles y el mismo número de pasos para todas las corridas. Con más cómputo, las etiquetas débiles podrían rendir más, sobre todo como pre-entrenamiento seguido de ajuste fino con las doradas, que es una alternativa que no exploramos.
+\item \textbf{Referencia peruana imperfecta.} EMSN038 no es verdad de terreno para la fecha del SAR (Sec.~\ref{sec:datos}). La brecha medida mezcla el error del modelo con el error de la referencia; separarlos exigiría una etiqueta manual sobre la propia escena SAR.
+\item \textbf{Solo SAR.} No se realizó la fusión opcional con Sentinel-2. En Lima, además, la nubosidad de marzo de 2017 limitaría la disponibilidad de imágenes ópticas coincidentes.
+\item \textbf{Umbral fijo.} Se usa 0.5 sobre la probabilidad; calibrar el umbral por región podría reducir parte de la brecha.
+\end{itemize}
+
+% ===========================================================================
+\section{Conclusiones}
+\PENDIENTEconc
+
+{\small
+\begin{thebibliography}{99}
+\bibitem[Bonafilia et~al.(2020)]{bonafilia2020} D.~Bonafilia, B.~Tellman, T.~Anderson y E.~Issenberg. Sen1Floods11: a georeferenced dataset to train and test deep learning flood algorithms for Sentinel-1. En \emph{CVPR Workshops}, 2020.
+\bibitem[Copernicus EMS(2017)]{emsn038} Copernicus Emergency Management Service. EMSN038: Post-disaster situation analyses of flood and landslides in Lima, Peru. \url{https://mapping.emergency.copernicus.eu/activations/EMSN038/}, 2017.
+\bibitem[Gorelick et~al.(2017)]{gorelick2017} N.~Gorelick, M.~Hancher, M.~Dixon, S.~Ilyushchenko, D.~Thau y R.~Moore. Google Earth Engine: planetary-scale geospatial analysis for everyone. \emph{Remote Sensing of Environment}, 202:18--27, 2017.
+\bibitem[He et~al.(2015)]{he2015} K.~He, X.~Zhang, S.~Ren y J.~Sun. Delving deep into rectifiers: surpassing human-level performance on ImageNet classification. En \emph{ICCV}, 2015.
+\bibitem[Ioffe y Szegedy(2015)]{ioffe2015} S.~Ioffe y C.~Szegedy. Batch normalization: accelerating deep network training by reducing internal covariate shift. En \emph{ICML}, 2015.
+\bibitem[Isensee et~al.(2021)]{isensee2021} F.~Isensee, P.~F. Jaeger, S.~A.~A. Kohl, J.~Petersen y K.~H. Maier-Hein. nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation. \emph{Nature Methods}, 18:203--211, 2021.
+\bibitem[Long et~al.(2015)]{long2015} J.~Long, E.~Shelhamer y T.~Darrell. Fully convolutional networks for semantic segmentation. En \emph{CVPR}, 2015.
+\bibitem[Loshchilov y Hutter(2019)]{loshchilov2019} I.~Loshchilov y F.~Hutter. Decoupled weight decay regularization. En \emph{ICLR}, 2019.
+\bibitem[Milletari et~al.(2016)]{milletari2016} F.~Milletari, N.~Navab y S.-A. Ahmadi. V-Net: fully convolutional neural networks for volumetric medical image segmentation. En \emph{3DV}, 2016.
+\bibitem[Oktay et~al.(2018)]{oktay2018} O.~Oktay et~al. Attention U-Net: learning where to look for the pancreas. En \emph{MIDL}, 2018.
+\bibitem[Otsu(1979)]{otsu1979} N.~Otsu. A threshold selection method from gray-level histograms. \emph{IEEE Trans. Systems, Man, and Cybernetics}, 9(1):62--66, 1979.
+\bibitem[Pekel et~al.(2016)]{pekel2016} J.-F. Pekel, A.~Cottam, N.~Gorelick y A.~S. Belward. High-resolution mapping of global surface water and its long-term changes. \emph{Nature}, 540:418--422, 2016.
+\bibitem[Ronneberger et~al.(2015)]{ronneberger2015} O.~Ronneberger, P.~Fischer y T.~Brox. U-Net: convolutional networks for biomedical image segmentation. En \emph{MICCAI}, 2015.
+\bibitem[Smith y Topin(2019)]{smith2019} L.~N. Smith y N.~Topin. Super-convergence: very fast training of neural networks using large learning rates. En \emph{Proc. SPIE 11006}, 2019.
+\bibitem[Torres et~al.(2012)]{torres2012} R.~Torres et~al. GMES Sentinel-1 mission. \emph{Remote Sensing of Environment}, 120:9--24, 2012.
+\bibitem[Twele et~al.(2016)]{twele2016} A.~Twele, W.~Cao, S.~Plank y S.~Martinis. Sentinel-1-based flood mapping: a fully automated processing chain. \emph{International Journal of Remote Sensing}, 37(13):2990--3004, 2016.
+\bibitem[Zhou et~al.(2018)]{zhou2018} Z.~Zhou, M.~M.~R. Siddiquee, N.~Tajbakhsh y J.~Liang. UNet++: a nested U-Net architecture for medical image segmentation. En \emph{DLMIA}, 2018.
+\end{thebibliography}
+}
+\end{document}

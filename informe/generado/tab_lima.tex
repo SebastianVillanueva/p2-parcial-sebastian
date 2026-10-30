@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering\small
+\caption{Generalización geográfica: el modelo entrenado solo con Sen1Floods11 evaluado sobre Lima (Sentinel-1 del 17-mar-2017 contra la delineación EMSN038), frente a la prueba en distribución.}
+\label{tab:lima}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{\begin{tabular}{lccccccc}
+\toprule
+ & IoU & IoU/chip & F1 & Precisión & Recall & Omisión & Comisión \\
+\midrule
+Prueba en distribución & 0.663 & 0.388 & 0.798 & 0.821 & 0.776 & 0.224 & 0.179 \\
+Lima 17-mar-2017 (EMSN038) & 0.001 & 0.010 & 0.002 & 0.001 & 0.006 & 0.994 & 0.999 \\
+Brecha (Lima $-$ dist.) & -0.662 & -0.379 & -0.796 & -0.820 & -0.770 & 0.770 & 0.820 \\
+\bottomrule
+\end{tabular}}
+\end{table}

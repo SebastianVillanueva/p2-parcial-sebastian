@@ -1,0 +1,62 @@
+% Párrafos que dependen de los resultados (redactados con los números reales de las corridas)
+\newcommand{\PENDIENTEb}{Las tres alternativas a la BCE pura obtienen un IoU de validación muy parecido: Dice (E3) 0.630, BCE con peso en bordes (E6) 0.624 y BCE + Dice (E4) 0.621. En prueba el orden se invierte (E6 0.665, E3 0.661, E4 0.656). Durante cada corrida, el IoU de validación oscila hasta $\pm$0.05 entre evaluaciones (Fig.~\ref{fig:curvas}), una variación mayor que la diferencia entre estas pérdidas, de modo que no hay un ganador claro entre las tres. La señal consistente es otra: \emph{todas} superan a la BCE pura (E1) en validación, en prueba ($+0.016$ a $+0.025$) y sobre todo en Bolivia (0.52--0.62 frente a 0.41). El mecanismo se ve en la precisión y el recall. Con solo un 9.5\,\% de píxeles de agua, la BCE produce un modelo conservador (precisión 0.886, recall 0.669 en validación). Dice, al optimizar directamente el solapamiento de la clase minoritaria, y el peso en bordes, al castigar los errores en el contorno, cambian algo de precisión por recall (0.70--0.72). Por su IoU de validación, Dice pasa a la etapa (c).}
+
+\newcommand{\PENDIENTEc}{Ninguna de las dos variantes empeora la validación: con un modelo 4 veces más pequeño (1.93\,M frente a 7.76\,M parámetros), la profundidad 3 obtiene el mejor IoU de validación de todo el estudio y, en prueba, iguala a la red completa (0.663 frente a 0.661). Con solo 252 chips de entrenamiento, la capacidad adicional del quinto nivel no se aprovecha. Además, a 10\,m por píxel, tres reducciones ($2^3$) dan un campo receptivo suficiente para reconocer cuerpos de agua. Quitar las conexiones de salto tampoco degrada el IoU de validación, a diferencia del experimento de la Clase~9, donde sí empeoraba la clase \emph{borde}. Sí cambia el tipo de error: la precisión cae de 0.832 a 0.792 en validación y de 0.827 a 0.799 en prueba, y el IoU de prueba baja de 0.661 a 0.649. Sin la información espacial fina que aportan los saltos, el contorno del agua se predice más ``engordado''. Que el efecto sea pequeño se explica porque el IoU agregado está dominado por cuerpos de agua grandes y homogéneos, para los que una localización gruesa basta. El modelo final, elegido por validación, es \BestRun{} (dorado, Dice, profundidad 3).}
+
+\newcommand{\PENDIENTEeval}{Frente al umbral de Otsu, la U-Net sube el IoU de 0.554 a 0.663 y reduce la comisión de 0.318 a 0.179, sin perder recall (0.776 frente a 0.748): aprende a no confundir con agua otras superficies oscuras, que el umbral marca indiscriminadamente. La matriz de confusión (Fig.~\ref{fig:cm}) muestra que el 97.6\,\% de los píxeles de no-agua y el 77.6\,\% de los de agua se clasifican bien. El error dominante es la omisión: de cada cuatro píxeles de agua, uno queda sin detectar. El IoU promedio por chip (0.388) es mucho menor que el agregado (0.663) porque muchos chips contienen muy poca agua, y en ellos unos pocos píxeles mal clasificados llevan el IoU del chip cerca de cero, mientras que el IoU agregado lo dominan los chips con grandes cuerpos de agua. \textbf{En Bolivia la relación se invierte}: Otsu (0.718) supera a la U-Net (0.572), cuyo recall cae a 0.618. Otsu recalcula su umbral a partir del histograma de cada escena y se adapta a la nueva región; la red, en cambio, aplica la relación aprendida en otros eventos. Es un primer aviso de que la generalización geográfica es el punto débil del modelo.}
+
+\newcommand{\PENDIENTEerr}{Los chips de prueba con más errores (Fig.~\ref{fig:errores}) muestran cuatro patrones:
+\begin{enumerate}
+\item \textbf{Superficies lisas no inundadas $\to$ falsos positivos.} En \texttt{Pakistan\_70625}, la etiqueta solo marca un canal, pero el modelo predice agua en parcelas oscuras: campos recién regados, suelo húmedo o sin vegetación, cuya superficie lisa también refleja la señal lejos del sensor. Es la confusión clásica entre suelo húmedo y agua abierta, y el SAR por sí solo no puede resolverla.
+\item \textbf{Vegetación inundada $\to$ falsos negativos.} En \texttt{Pakistan\_849790} e \texttt{India\_747992}, grandes zonas etiquetadas como agua aparecen en gris medio y no en negro: hay agua bajo cultivos o vegetación. La señal rebota entre la superficie del agua y los tallos (\emph{doble rebote}) y vuelve con más energía, de modo que el agua ``no se ve oscura'' y el modelo la omite. Es la principal fuente de omisión del modelo.
+\item \textbf{Mosaicos urbano-agrícolas $\to$ errores de borde y doble rebote urbano.} En \texttt{Spain\_7387658} se mezclan los dos tipos de error: falsos positivos finos en los bordes de parcelas y caminos, y falsos negativos dentro del casco urbano. Ahí las edificaciones con agua alrededor producen un doble rebote brillante. Es el escenario más parecido al de Lima.
+\item \textbf{Errores de la propia etiqueta.} En \texttt{Ghana\_866994}, la etiqueta dorada está formada por polígonos suavizados y con grandes zonas sin datos (nubes en la imagen óptica de referencia), y en \texttt{USA\_595451} e \texttt{India\_399883} hay zonas muy oscuras y contiguas al río que no se marcaron como agua. Parte de los ``errores'' son desacuerdos con una referencia imperfecta: también las etiquetas doradas tienen ruido.
+\end{enumerate}
+La sombra de radar no aparece en estos chips, porque los eventos de Sen1Floods11 están en llanuras; sí es relevante en el valle encajonado del Rímac (Sec.~\ref{sec:lima}).}
+
+\newcommand{\PENDIENTElima}{\textbf{Resultado.} Sobre Lima, el modelo final obtiene un IoU de 0.001 (precisión 0.001, recall 0.006), frente a 0.663 en distribución (Tabla~\ref{tab:lima}). Solo detecta agua en el 1.7\,\% de los 293 polígonos EMSN038 evaluables (criterio: $\geq$25\,\% de su área), y el área evaluable es de 1\,709\,km², de los cuales 5.98\,km² están marcados como inundados. Las siete corridas fallan por igual (IoU entre 0.0003 y 0.013; Tabla~\ref{tab:limatodas}), con independencia de su desempeño en validación o en Bolivia. E2, la mejor en Bolivia, es incluso la peor en Lima. Ninguna decisión de la ablación cambia el resultado, lo que sugiere una causa común ajena al modelo.
+
+\begin{table}[t]
+\centering\small
+\caption{Izquierda: IoU de cada corrida en validación, prueba, Bolivia y Lima. Derecha: diagnóstico físico de la escena de Lima, con la mediana de retrodispersión en dB.}
+\label{tab:limatodas}
+\begin{minipage}[t]{0.52\linewidth}\centering\vspace{0pt}
+\resizebox{\linewidth}{!}{\begin{tabular}{lcccc}
+\toprule
+ & Val & Test & Bolivia & Lima \\
+\midrule
+E1 & 0.615 & 0.640 & 0.408 & 0.007 \\
+E2 & 0.598 & 0.641 & \textbf{0.716} & 0.000 \\
+E3 & 0.630 & 0.661 & 0.615 & 0.008 \\
+E4 & 0.621 & 0.656 & 0.518 & 0.007 \\
+E6 & 0.624 & \textbf{0.665} & 0.598 & \textbf{0.013} \\
+E5a & 0.634 & 0.649 & 0.594 & 0.003 \\
+E5b & \textbf{0.641} & 0.663 & 0.572 & 0.001 \\
+\bottomrule
+\end{tabular}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\linewidth}\centering\vspace{0pt}
+\resizebox{\linewidth}{!}{\begin{tabular}{lcc}
+\toprule
+VH (dB) & Agua/inund. & Resto \\
+\midrule
+Sen1Floods11 & $-25.4$ & $-16.0$ \\
+Lima 17-mar & $-18.9$ & $-17.5$ \\
+Lima 29-mar & $-19.3$ & $-17.4$ \\
+\midrule
+\multicolumn{3}{l}{Cambio 29$-$17 mar: $-0.41$ (dentro) / $+0.05$ (fuera)} \\
+\multicolumn{3}{l}{Otsu escena: IoU 0.005, P 0.005, R 0.725} \\
+\bottomrule
+\end{tabular}}
+\end{minipage}
+\end{table}
+
+\textbf{Diagnóstico físico: ¿hay agua visible para el radar?} Antes de atribuir la brecha al modelo, comparamos la retrodispersión dentro y fuera de los polígonos (Tabla~\ref{tab:limatodas}, Fig.~\ref{fig:hist}). Dentro de los polígonos, la mediana de VH es de $-18.9$\,dB, apenas 1.4\,dB más oscura que el resto de Lima ($-17.5$) y lejos de los $-25.4$\,dB del agua de Sen1Floods11. Solo el 35\,\% de esos píxeles cae por debajo de $-20$\,dB, frente al 78\,\% del agua de entrenamiento. Si el 17 de marzo hubiera habido una lámina de agua que luego se retiró, la señal debería haber subido varios dB hacia el 29; dentro de los polígonos, en cambio, \emph{bajó} 0.41\,dB, mientras que afuera no cambió. Por último, un umbral de Otsu calculado sobre la propia escena (sin entrenamiento) recupera el 72\,\% de los píxeles marcados, pero con precisión 0.005 (IoU 0.005): la leve oscuridad de los polígonos no se distingue del resto de la ciudad y del desierto. La conclusión es que \textbf{el SAR del 17 de marzo no muestra agua abierta donde EMSN038 marca inundación}.}
+
+\newcommand{\PENDIENTEconc}{Implementamos una U-Net propia para mapear agua a partir de Sentinel-1 y la evaluamos en tres niveles de dificultad.
+\begin{itemize}
+\item \textbf{En distribución}, el modelo final (profundidad 3, pérdida Dice, solo etiquetas doradas) alcanza un IoU de 0.663 y supera al umbral de Otsu (0.554), sobre todo porque reduce la comisión. Las pérdidas que atienden el desbalance (Dice, BCE + Dice, BCE con bordes) superan a la BCE pura. Una red cuatro veces más pequeña rinde igual que la completa, lo que indica que, con 252 chips, el límite son los datos y no la capacidad.
+\item \textbf{En un evento no visto (Bolivia)}, la elección de supervisión es decisiva. Añadir etiquetas débiles no mejora la validación en distribución, pero sube el IoU en Bolivia de 0.41 a 0.72, porque corrige el recall de un modelo demasiado conservador. Elegir el modelo solo con la validación en distribución descarta justamente la opción que mejor generaliza, y en esa región un umbral adaptativo por escena (Otsu) sigue siendo un competidor fuerte.
+\item \textbf{En Lima}, ninguna variante funciona (IoU $\leq$0.013). El diagnóstico físico muestra que la brecha se explica sobre todo por la referencia, no por el modelo: la escena SAR del 17 de marzo no contiene agua abierta en los polígonos de EMSN038, que cartografían huellas de inundación y depósitos de huaico vistos en imágenes ópticas días después. Los errores que sí son del modelo, como los falsos positivos por sombra de radar en las laderas, se deben al relieve abrupto, ausente en los datos de entrenamiento.
+\end{itemize}
+Para un uso operativo en el Perú se desprenden tres recomendaciones: (i) etiquetar a mano, sobre la propia escena SAR, al menos un evento peruano para validar con una referencia coherente; (ii) incorporar el modelo de elevación (pendiente y máscara de sombra o \emph{layover}) como entrada o filtro; y (iii) para huaicos, que son eventos de horas, combinar la detección de agua con la detección de \emph{cambio} entre una escena previa y una posterior de la misma órbita, en lugar de buscar agua abierta en una sola fecha.}

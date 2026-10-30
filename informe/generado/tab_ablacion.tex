@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering\small
+\caption{Estudio de ablación. Todas las corridas usan el mismo presupuesto (3000 pasos, lote 16, recortes de 256\,px). La selección se hace con el IoU de agua en \emph{validación} (en negrita el mejor); las columnas de prueba y Bolivia se reportan solo como referencia.}
+\label{tab:ablacion}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{\begin{tabular}{lllcrcccc}
+\toprule
+ & Datos & Pérdida & Arquitectura & Parám. (M) & IoU val & IoU test & F1 test & IoU Bolivia \\
+\midrule
+E1 & dorado & BCE & con saltos, prof. 4 & 7.76 & 0.615 & 0.640 & 0.781 & 0.408 \\
+E2 & dorado + débil & BCE & con saltos, prof. 4 & 7.76 & 0.598 & 0.641 & 0.781 & 0.716 \\
+E3 & dorado & Dice & con saltos, prof. 4 & 7.76 & 0.630 & 0.661 & 0.796 & 0.615 \\
+E4 & dorado & BCE + Dice & con saltos, prof. 4 & 7.76 & 0.621 & 0.656 & 0.792 & 0.518 \\
+E6 & dorado & BCE con peso en bordes & con saltos, prof. 4 & 7.76 & 0.624 & 0.665 & 0.799 & 0.598 \\
+E5a & dorado & Dice & sin saltos, prof. 4 & 6.98 & 0.634 & 0.649 & 0.787 & 0.594 \\
+E5b & dorado & Dice & con saltos, prof. 3 & 1.93 & \textbf{0.641} & 0.663 & 0.798 & 0.572 \\
+\bottomrule
+\end{tabular}}
+\end{table}
