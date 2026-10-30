@@ -13,7 +13,9 @@ Segmentación píxel a píxel del agua de inundación a partir de radar Sentinel
 4. Una **región de prueba propia para el Perú**: Sentinel-1 del 17-mar-2017 sobre Lima, comparado con la delineación **Copernicus EMS EMSN038** e inferido con la estrategia *overlap-tile*.
 5. Un **análisis cualitativo** de errores característicos del SAR.
 
-**Informe:** [`Informe_P2_Inundaciones_Sentinel1.pdf`](Informe_P2_Inundaciones_Sentinel1.pdf), en formato NeurIPS y 10 páginas.
+**Informe:** [`Informe_P2_Inundaciones_Sentinel1.pdf`](Informe_P2_Inundaciones_Sentinel1.pdf) (10 páginas, mismo formato que el resto de preguntas del grupo).
+
+**Repositorio:** <https://github.com/SebastianVillanueva/p2-parcial-sebastian>
 
 ## Resultados principales
 

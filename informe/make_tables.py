@@ -50,12 +50,12 @@ def main():
                      f"{f3((r.get('bolivia') or {}).get('IoU'))} \\\\")
     tab = r"""\begin{table}[t]
 \centering\small
-\caption{Estudio de ablación. Todas las corridas usan el mismo presupuesto (%d pasos, lote 16, recortes de 256\,px). La selección se hace con el IoU de agua en \emph{validación} (en negrita el mejor); las columnas de prueba y Bolivia se reportan solo como referencia.}
+\caption{Estudio de ablación. Todas las corridas usan el mismo presupuesto (%d pasos, lote 16, recortes de 256\,px). La selección se hace con el IoU de agua en \emph{validación} (el mejor, en negrita); las columnas de prueba y Bolivia se reportan solo como referencia.}
 \label{tab:ablacion}
 \setlength{\tabcolsep}{4pt}
 \resizebox{\linewidth}{!}{\begin{tabular}{lllcrcccc}
 \toprule
- & Datos & Pérdida & Arquitectura & Parám. (M) & IoU val & IoU test & F1 test & IoU Bolivia \\
+\textbf{Corrida} & \textbf{Datos} & \textbf{Pérdida} & \textbf{Arquitectura} & \textbf{Parám. (M)} & \textbf{IoU val} & \textbf{IoU test} & \textbf{F1 test} & \textbf{IoU Bolivia} \\
 \midrule
 %s
 \bottomrule
@@ -77,7 +77,7 @@ def main():
 \setlength{\tabcolsep}{4pt}
 \resizebox{\linewidth}{!}{\begin{tabular}{lccccccc}
 \toprule
- & IoU & IoU/chip & F1 & Precisión & Recall & Omisión & Comisión \\
+\textbf{Conjunto} & \textbf{IoU} & \textbf{IoU/chip} & \textbf{F1} & \textbf{Precisión} & \textbf{Recall} & \textbf{Omisión} & \textbf{Comisión} \\
 \midrule
 %s
 \bottomrule
@@ -99,7 +99,7 @@ def main():
 \setlength{\tabcolsep}{4pt}
 \resizebox{\linewidth}{!}{\begin{tabular}{lccccccc}
 \toprule
- & IoU & IoU/chip & F1 & Precisión & Recall & Omisión & Comisión \\
+\textbf{Conjunto} & \textbf{IoU} & \textbf{IoU/chip} & \textbf{F1} & \textbf{Precisión} & \textbf{Recall} & \textbf{Omisión} & \textbf{Comisión} \\
 \midrule
 %s
 \bottomrule
